@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mime-info xmlns="http://www.freedesktop.org/standards/shared-mime-info">
+   <mime-type type="image/p16">
+     <comment>P16 image</comment>
+     <glob pattern="*.p16"/>
+   </mime-type>
+</mime-info>
