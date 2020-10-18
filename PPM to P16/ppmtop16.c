@@ -72,7 +72,7 @@ int main(int argc, char *argv[]) {
 	  printf("Error while opening file %s!\n", filenameIn);
 	  return 1;
 	}
-
+  
 	ch[0] = svp_fread_u8(fPointer);
 	ch[1] = svp_fread_u8(fPointer);
 	if ((ch[0] != 'P') && (ch[1] != '6')) {
@@ -80,22 +80,25 @@ int main(int argc, char *argv[]) {
 		return 1;
 	}
 	fpos = 3;
-	while (ch2 != 10) {
+	fseek(fPointer, sizeof(uint8_t) * (fpos), SEEK_SET);
+  if(svp_fread_u8(fPointer) == '#') {	
+	  while (ch2 != 10) {
+	    fseek(fPointer, sizeof(uint8_t) * (fpos), SEEK_SET);
+		  ch2 = svp_fread_u8(fPointer);
+		  fpos++;
+	  }
+	}
+  
+  ch2 = 0;
+  a = 0;
+  while (ch2 != 10) {
 	  fseek(fPointer, sizeof(uint8_t) * (fpos), SEEK_SET);
-		ch2 = svp_fread_u8(fPointer);
-		fpos++;
-	}
-	ch2 = 0;
-	a = 0;
-	while (ch2 != 10) {
-		fseek(fPointer, sizeof(uint8_t) * (fpos), SEEK_SET);
-		ch2 = svp_fread_u8(fPointer);
-		ch[a] = ch2;
-		fpos++;
-		a++;
-	}
-	ch[a] = 10;
-
+	  ch2 = svp_fread_u8(fPointer);
+	  ch[a] = ch2;
+	  fpos++;
+	  a++;
+  }
+  ch[a] = 10;
 	a = 0;
 	while (ch[a] != ' ') {
 		img_width *= 10;
@@ -111,6 +114,8 @@ int main(int argc, char *argv[]) {
 
 	ch2 = 0;
 
+  printf("Image size: w: %u, h: %u \n", img_width, img_height);
+
 	while(ch2 != 10) {
 	  fseek(fPointer, sizeof(uint8_t) * (fpos), SEEK_SET);
 		ch2 = svp_fread_u8(fPointer);
@@ -122,7 +127,7 @@ int main(int argc, char *argv[]) {
 
 	uint8_t rgtmp[3];
 
-	printf("testy test: w: %u, h: %u \n", img_width, img_height);
+	
 
 	FILE *fOut;
 
