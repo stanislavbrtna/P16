@@ -218,7 +218,11 @@ int main(int argc, char *argv[]) {
   }
 
   SDL_Init( SDL_INIT_VIDEO );
-  SDL_CreateWindowAndRenderer(header.imageWidth, header.imageHeight, 0, &window, &gRenderer) ;
+  if (header.imageWidth > 100) {
+    SDL_CreateWindowAndRenderer(header.imageWidth, header.imageHeight, 0, &window, &gRenderer);
+  } else {
+    SDL_CreateWindowAndRenderer(256, header.imageHeight + 20, 0, &window, &gRenderer);    
+  }
 
   fb_clear();
 
