@@ -5,6 +5,8 @@
 #include <unistd.h>
 #include <sys/types.h>
 
+#define USE_PRECISE_COLORS
+
 uint8_t svp_fread_u8(FILE *fp) {
   uint8_t x;
 
@@ -13,13 +15,12 @@ uint8_t svp_fread_u8(FILE *fp) {
 }
 
 void svp_fwrite_u8(FILE *fp, uint8_t val) {
-  if(fwrite(&val, sizeof(uint8_t), 1, fp) == 0){
+  if(fwrite(&val, sizeof(uint8_t), 1, fp) == 0) {
     //printf("fwrite error! (1)\n");
   }
 }
 
 int main(int argc, char *argv[]) {
-
   FILE     *fPointer;
 	uint8_t  ch[16];
 	uint8_t  ch2 = 0;
@@ -33,7 +34,12 @@ int main(int argc, char *argv[]) {
 	uint8_t  compression = 1;
 
   if (argc < 2) {
-    printf("usage: %s [input.ppm] (output.p16) (0|1 - compression mode)\n", argv[0]);
+    printf("usage: %s [input.ppm] (output.p16) (0|1 - compression mode)\nptp16 v1.1", argv[0]);
+#ifdef USE_PRECISE_COLORS
+    printf(" Precise colors enabled.");
+#endif
+    printf("\n");
+
     return 0;
   }
 
@@ -138,10 +144,6 @@ int main(int argc, char *argv[]) {
 	svp_fwrite_u8(fOut, compression); // storege mode
 	svp_fwrite_u8(fOut, 1);           // data offset
 
-
-  int16_t xi = 0;
-	int16_t yi = 0;
-
   if (compression == 0) {
     printf("No compression\n");
     
@@ -152,9 +154,15 @@ int main(int argc, char *argv[]) {
 		  g = rgtmp[1];
 		  b = rgtmp[2];
 
-		  r = ( r * 249 + 1014 ) >> 11; //5
-		  g = ( g * 253 + 505 ) >> 10; //6
-		  b = ( b * 249 + 1014 ) >> 11; //5
+#ifdef USE_PRECISE_COLORS
+      r = (uint8_t) ((((float) r) / 256.0) * 32);
+      g = (uint8_t) ((((float) g) / 256.0) * 64);
+      b = (uint8_t) ((((float) b) / 256.0) * 32);
+#else
+		  r = ( r * 249 + 1014 ) >> 11; // 5
+		  g = ( g * 253 + 505 )  >> 10; // 6
+		  b = ( b * 249 + 1014 ) >> 11; // 5
+#endif
 
 		  color = r << 11 | (g & 0x3F) << 5 | (b & 0x1F);
 
@@ -175,9 +183,15 @@ int main(int argc, char *argv[]) {
 		  g = rgtmp[1];
 		  b = rgtmp[2];
 
-		  r = ( r * 249 + 1014 ) >> 11; //5
-		  g = ( g * 253 + 505 ) >> 10; //6
-		  b = ( b * 249 + 1014 ) >> 11; //5
+#ifdef USE_PRECISE_COLORS
+      r = (uint8_t) ((((float) r) / 256.0) * 32);
+      g = (uint8_t) ((((float) g) / 256.0) * 64);
+      b = (uint8_t) ((((float) b) / 256.0) * 32);
+#else
+		  r = ( r * 249 + 1014 ) >> 11; // 5
+		  g = ( g * 253 + 505 )  >> 10; // 6
+		  b = ( b * 249 + 1014 ) >> 11; // 5
+#endif
 
 		  color = r << 11 | (g & 0x3F) << 5 | (b & 0x1F);
 
