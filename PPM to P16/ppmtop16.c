@@ -20,25 +20,17 @@ void svp_fwrite_u8(FILE *fp, uint8_t val) {
 
 int main(int argc, char *argv[]) {
 
-  FILE *fPointer;
-
-	uint8_t ch[16];
-	uint8_t ch2 = 0;
+  FILE     *fPointer;
+	uint8_t  ch[16];
+	uint8_t  ch2 = 0;
 	uint16_t a, color;
 	uint32_t fpos = 0;
-	uint32_t fpos_line_begin;
-	uint8_t r, g, b;
+	uint8_t  r, g, b;
 	uint16_t img_width = 0;
 	uint16_t img_height = 0;
-	int16_t xi = 0;
-	int16_t yi = 0;
-	uint8_t n, laneScaleCnt;
-	uint8_t scale;
-	uint8_t fnameBuffer[512];
-
-
-	uint8_t * filenameIn, * filenameOut;
-	uint8_t compression = 1;
+	uint8_t  fnameBuffer[512];
+  uint8_t  *filenameIn, * filenameOut;
+	uint8_t  compression = 1;
 
   if (argc < 2) {
     printf("usage: %s [input.ppm] (output.p16) (0|1 - compression mode)\n", argv[0]);
@@ -122,13 +114,7 @@ int main(int argc, char *argv[]) {
 		fpos++;
 	}
 
-	fpos_line_begin = fpos;
-	laneScaleCnt = 0;
-
 	uint8_t rgtmp[3];
-
-	
-
 	FILE *fOut;
 
 	fOut = fopen(filenameOut, "wb");
@@ -153,35 +139,18 @@ int main(int argc, char *argv[]) {
 	svp_fwrite_u8(fOut, 1);           // data offset
 
 
+  int16_t xi = 0;
+	int16_t yi = 0;
+
   if (compression == 0) {
     printf("No compression\n");
-    scale = 1;
-	  while (1) {
+    
+    for (int i = 0; i < img_width*img_height; i++) {
 		  fread(rgtmp, sizeof(rgtmp), 1, fPointer);
-		  fpos += 3;
 
 		  r = rgtmp[0];
 		  g = rgtmp[1];
 		  b = rgtmp[2];
-
-		  if (xi == img_width - 1) {
-		    laneScaleCnt++;
-		    if (laneScaleCnt == scale) {
-			    yi++;
-			    xi = 0;
-			    laneScaleCnt = 0;
-			    fpos_line_begin = fpos;
-		    } else {
-		      xi = 0;
-		      fpos = fpos_line_begin;
-		    }
-		  } else {
-			  xi++;
-		  }
-
-		  if (yi == img_height - 1) {
-			  break;
-		  }
 
 		  r = ( r * 249 + 1014 ) >> 11; //5
 		  g = ( g * 253 + 505 ) >> 10; //6
@@ -195,8 +164,6 @@ int main(int argc, char *argv[]) {
 
 	if (compression == 1) {
 	  printf("Normal compression\n");
-    scale = 1;
-
     uint16_t prevColor;
     uint16_t prevColor2;
     uint16_t sameDetect = 0;
@@ -230,7 +197,6 @@ int main(int argc, char *argv[]) {
 	      if (color == prevColor) {
 	        sameDetect++;
 	      } else {
-	        //printf("detected same: %u\n", sameDetect);
 	        fwrite(&sameDetect, sizeof(sameDetect), 1, fOut);
 	        fwrite(&color, sizeof(color), 1, fOut);
 	        sameDetect = 0;
